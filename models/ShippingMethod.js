@@ -1,8 +1,19 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const shippingMethodSchema = new mongoose.Schema({
-    name: { type: String, required: true },
-    carrier: { type: mongoose.Schema.Types.ObjectId, ref: 'ShippingCarrier', required: true }
+  carrierID: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "ShippingCarrier",
+    required: true,
+  },
+  cost: {
+    type: Number,
+    required: true,
+  },
+  delieveryTime: {
+    type: Date,
+    required: true,
+  },
 });
 
-module.exports = mongoose.model('ShippingMethod', shippingMethodSchema);
+module.exports = mongoose.model("ShippingMethod", shippingMethodSchema);
