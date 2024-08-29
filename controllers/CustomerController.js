@@ -1,1 +1,1 @@
-const Customer = require("../Database/models/Customer");
+const Customer = require("../Models/Customer");
