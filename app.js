@@ -1,5 +1,7 @@
 const express = require("express");
 const connectDB = require("./Config/db");
+const customerRoute = require("./routes/CustomerRoute");
+const bodyparser = require("body-parser");
 const PORT = process.env.PORT || 3000;
 
 const app = express();
@@ -7,9 +9,25 @@ require("dotenv").config(); // Automatically looks for .env in the root director
 
 connectDB();
 
-app.get("/", (req, res) => {
-  res.send({ message: "Hello" });
-});
+
+//JSON PARSER
+app.use(bodyparser.json());
+app.use(bodyparser.urlencoded({extended: true}));;
+
+
+app.use("/api/customer",customerRoute);
+
+
+app.use((err,req,res,next)=>{
+  const {status, message} = err;
+  res.status(status).send({
+      success: false,
+      status: status,
+      message: message
+  })
+  console.log(err);
+})
+
 
 app.listen(PORT, () => {
   console.log(`Server is live on PORT: ${PORT}`);
