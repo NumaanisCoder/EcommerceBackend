@@ -16,6 +16,11 @@ connectDB();
 app.use(bodyparser.json());
 app.use(bodyparser.urlencoded({extended: true}));;
 
+app.get("/",(req,res)=>{
+  res.json({
+    message: "Server is on"
+  })
+})
 
 app.use("/api/customer",customerRoute);
 app.use("/api/seller",sellerRoute)
