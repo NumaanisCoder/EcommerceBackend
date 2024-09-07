@@ -1,5 +1,5 @@
 const { welcomeEmail } = require("../MailSender/WelcomeEmail");
-const Customer = require("../Models/Customer");
+const Customer = require("../models/Customer");
 const { asyncErrorHandler, ErrorHandler } = require("../utils/ErrorHandler");
 const bcrypt = require("bcrypt");
 const { getToken, verifyToken } = require("../utils/TokenHandler");
