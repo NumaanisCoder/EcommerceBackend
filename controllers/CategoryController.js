@@ -8,7 +8,7 @@ module.exports.createCategory = asyncErrorHandler(async (req,res,next)=> {
 
     const {name} = req.body;
     console.log("Category name is" , name)
-    const existingCategory = await Category.find({name: name});
+    const existingCategory = await Category.findOne({name: name});
 
     if(existingCategory){
         return next(new ErrorHandler(400, "Same Category Already Exist"))
