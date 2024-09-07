@@ -1,6 +1,8 @@
 const express = require("express");
 const connectDB = require("./Config/db");
 const customerRoute = require("./routes/CustomerRoute");
+const sellerRoute = require("./routes/SellerRoute");
+const categoryRoute = require("./routes/CategoryRoute");
 const bodyparser = require("body-parser");
 const PORT = process.env.PORT || 3000;
 
@@ -16,6 +18,8 @@ app.use(bodyparser.urlencoded({extended: true}));;
 
 
 app.use("/api/customer",customerRoute);
+app.use("/api/seller",sellerRoute)
+app.use("/api/category", categoryRoute);
 
 
 app.use((err,req,res,next)=>{
