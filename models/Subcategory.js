@@ -5,7 +5,7 @@ const subCategorySchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  parentCategory: {
+  categoryID: {
     type: mongoose.Schema.Types.ObjectId, 
     ref: "Category"
   }

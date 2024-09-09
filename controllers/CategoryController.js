@@ -32,7 +32,7 @@ module.exports.createSubCategory = asyncErrorHandler(async (req,res,next) => {
     if(!parentCategoryDoc){
         return next(new ErrorHandler(400, "Parent Category Not Found"))
     }
-    const existingSubCategory = await SubCategory.findOne({name: name, parentCategory: parentCategoryDoc._id});
+    const existingSubCategory = await SubCategory.findOne({name: name, categoryID: parentCategoryDoc._id});
 
     if(existingSubCategory){
         return next(new ErrorHandler(400, "Same SubCategory Already Exist for Parent Category"))
@@ -56,10 +56,10 @@ module.exports.createSubCategory = asyncErrorHandler(async (req,res,next) => {
 
 module.exports.getCategory = asyncErrorHandler(async (req,res,next) => {
 
-    const allcategories = await Category.find({}).populate('subcategories');
+    const allcategories = await Category.find({}).populate('subCategories');
 
     res.status(200).json({
         success: true,
-        Categories: allcategories
+        categories: allcategories
     })
 })
