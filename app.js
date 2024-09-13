@@ -4,7 +4,7 @@ const customerRoute = require("./routes/CustomerRoute");
 const sellerRoute = require("./routes/SellerRoute");
 const categoryRoute = require("./routes/CategoryRoute");
 const bodyparser = require("body-parser");
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3333;
 
 const app = express();
 require("dotenv").config(); // Automatically looks for .env in the root directory

@@ -69,14 +69,6 @@ module.exports.getCategories = asyncErrorHandler(async (req,res,next) => {
                 foreignField:"categoryID",
                 as:"subCategories"
             }
-        },
-        {
-            $project:{
-                _id:1,
-                name:1,
-                "subCategories._id":1,
-                "subCategories.name":1
-            }
         }
     ]);
 
