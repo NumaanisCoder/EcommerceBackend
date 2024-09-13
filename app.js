@@ -18,7 +18,7 @@ app.use(bodyparser.urlencoded({extended: true}));;
 
 app.get("/",(req,res)=>{
   res.json({
-    message: "Server is on"
+    message: `Server is on at Port: ${PORT}`
   })
 })
 
