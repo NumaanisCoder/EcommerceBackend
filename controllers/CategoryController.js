@@ -1,5 +1,4 @@
 const Category = require("../models/Category");
-
 const SubCategory = require("../models/Subcategory");
 const { asyncErrorHandler, ErrorHandler } = require("../utils/ErrorHandler");
 
@@ -7,15 +6,14 @@ const { asyncErrorHandler, ErrorHandler } = require("../utils/ErrorHandler");
 module.exports.createCategory = asyncErrorHandler(async (req,res,next)=> {
 
     const {name} = req.body;
-    console.log("Category name is" , name)
-    const existingCategory = await Category.findOne({name: name});
+    // console.log("Category name is" , name)
 
+    const existingCategory = await Category.findOne({name: name});
     if(existingCategory){
-        return next(new ErrorHandler(400, "Same Category Already Exist"))
+        return next(new ErrorHandler(400, "Category Already Exist!"))
     }
     
     const newCategory = await Category({name});
-
     await newCategory.save();
 
     res.status(201).json({
@@ -25,27 +23,34 @@ module.exports.createCategory = asyncErrorHandler(async (req,res,next)=> {
 })
 
 module.exports.createSubCategory = asyncErrorHandler(async (req,res,next) => {
-    const {name, parentCategory} = req.body;
+    const {name, categoryID} = req.body;
 
 
-    const parentCategoryDoc = await Category.findOne({name: parentCategory})
+    const parentCategoryDoc = await Category.findOne({_id: categoryID})
     if(!parentCategoryDoc){
-        return next(new ErrorHandler(400, "Parent Category Not Found"))
+        return next(new ErrorHandler(400, "Category Not Found!"));
     }
-    const existingSubCategory = await SubCategory.findOne({name: name, categoryID: parentCategoryDoc._id});
 
+    const existingSubCategory = await SubCategory.findOne({name: name});
     if(existingSubCategory){
-        return next(new ErrorHandler(400, "Same SubCategory Already Exist for Parent Category"))
+        return next(new ErrorHandler(400, "Subcategory Already Exist!"))
     }
 
   
     const newSubCategory = new SubCategory({name});
-
-    newSubCategory.parentCategory = parentCategoryDoc._id;
+    newSubCategory.categoryID = parentCategoryDoc._id;
     await newSubCategory.save();
+
+    /* 
+    ------------------
+    We don't need to save subCategory ObjectID into category document.
+    ------------------
 
     parentCategoryDoc.subcategories.push(newSubCategory._id);
     await parentCategoryDoc.save();
+
+    */
+    
 
     res.status(201).json({
         success: true,
@@ -54,12 +59,29 @@ module.exports.createSubCategory = asyncErrorHandler(async (req,res,next) => {
 
 })
 
-module.exports.getCategory = asyncErrorHandler(async (req,res,next) => {
+module.exports.getCategories = asyncErrorHandler(async (req,res,next) => {
 
-    const allcategories = await Category.find({}).populate('subCategories');
+    const result = await Category.aggregate([
+        {
+            $lookup:{
+                from: "subcategories",
+                localField:"_id",
+                foreignField:"categoryID",
+                as:"subCategories"
+            }
+        },
+        {
+            $project:{
+                _id:1,
+                name:1,
+                "subCategories._id":1,
+                "subCategories.name":1
+            }
+        }
+    ]);
 
     res.status(200).json({
         success: true,
-        categories: allcategories
+        categories: result
     })
 })
