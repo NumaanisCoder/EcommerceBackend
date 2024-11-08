@@ -5,9 +5,17 @@ const sellerSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  businessName:{
+    type: String,
+    required: true
+  },
   email: {
     type: String,
     required: true,
+  },
+  isEmailVerified:{
+    type: Boolean,
+    default: false
   },
   password: {
     type: String,

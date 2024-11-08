@@ -2,20 +2,20 @@ const { welcomeEmail } = require("../MailSender/WelcomeEmail");
 
 const { asyncErrorHandler, ErrorHandler } = require("../utils/ErrorHandler");
 const bcrypt = require("bcrypt");
-const { getToken, verifyToken } = require("../utils/TokenHandler");
+const { getToken, verifyToken, getEmailToken } = require("../utils/TokenHandler");
 const { sendResendEmail } = require("../MailSender/ResetEmail");
 const Seller = require('../models/Seller');
 
 
 
 module.exports.Registration = asyncErrorHandler(async (req, res, next) => {
-    const { name, email, phone, password,address, warehouseAddress, gst } = req.body;
+    const { name,businessName, email, phone, password,address, warehouseAddress, gst } = req.body;
     
-
+console.log(req.body);
     const ifEmailAlreadyExist = await Seller.findOne({email:email});
 
 
-    if(!name || !email || !password || !gst || !address || !warehouseAddress || !phone){
+    if(!name || !businessName || !email || !password || !gst || !address || !warehouseAddress || !phone){
         return next(new ErrorHandler(404,"Incomplete Details"));
         
     }
@@ -28,6 +28,7 @@ module.exports.Registration = asyncErrorHandler(async (req, res, next) => {
     // Create a new Seller with the hashed password
     const newSeller = new Seller({
         name,
+        businessName,
         email,
         phone,
         password: hashedPassword,
@@ -38,7 +39,8 @@ module.exports.Registration = asyncErrorHandler(async (req, res, next) => {
 
     // Save the new Seller to the database
     await newSeller.save();
-    await welcomeEmail(email, "SHOP");
+    const emailVerificationToken = getEmailToken(email, '1d');
+    await welcomeEmail(email, name, emailVerificationToken);
     const token = getToken(newSeller._id, '7d');
 
     // Respond with success and the new Seller's data
@@ -98,8 +100,6 @@ module.exports.getSellerDetail = asyncErrorHandler(async (req,res,next) =>{
     }
     const {id} = decoded;
     const seller = await Seller.findById(id);
-    console.log(token, seller)
-
     res.json({
         success: true,
         sellerDetail: seller
@@ -107,4 +107,41 @@ module.exports.getSellerDetail = asyncErrorHandler(async (req,res,next) =>{
 
 
 })
+
+
+module.exports.verifyEmail = asyncErrorHandler(async (req, res, next) => {
+    try {
+        const token = req.params.token;
+
+        // Verify the token
+        const { decoded, expired, valid } = verifyToken(token);
+        if (expired || !valid) {
+            return next(new ErrorHandler(400, "Token is invalid or expired"));
+        }
+
+        const { email } = decoded;
+        console.log(decoded);
+
+        // Find the seller using the decoded email
+        const seller = await Seller.findOne({ email });
+        if (!seller) {
+            return next(new ErrorHandler(404, "Seller not found"));
+        }
+
+        // Check if the email is already verified
+        if (seller.isEmailVerified) {
+            return res.send(`<h1>Email ${email} is already verified.</h1>`);
+        }
+
+        // Update seller's email verification status
+        seller.isEmailVerified = true;
+        await seller.save();
+
+        // Send success response
+        res.send(`<h1>Your email ${email} has been successfully verified!</h1>`);
+
+    } catch (error) {
+        next(new ErrorHandler(500, "An error occurred during email verification"));
+    }
+});
 

@@ -3,14 +3,18 @@ const connectDB = require("./config/db");
 const customerRoute = require("./routes/CustomerRoute");
 const sellerRoute = require("./routes/SellerRoute");
 const categoryRoute = require("./routes/CategoryRoute");
+const productRoute = require("./routes/ProductRoute");
 const bodyparser = require("body-parser");
 const PORT = process.env.PORT || 3333;
+const cors = require('cors');
+
 
 const app = express();
 require("dotenv").config(); // Automatically looks for .env in the root directory
 
 connectDB();
 
+app.use(cors());
 
 //JSON PARSER
 app.use(bodyparser.json());
@@ -25,6 +29,7 @@ app.get("/",(req,res)=>{
 app.use("/api/customer",customerRoute);
 app.use("/api/seller",sellerRoute)
 app.use("/api/category", categoryRoute);
+app.use('/api/product',productRoute);
 
 
 app.use((err,req,res,next)=>{

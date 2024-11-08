@@ -8,6 +8,14 @@ module.exports.getToken = (id, expiry) => {
 
     return token;
 }
+module.exports.getEmailToken = (email, expiry) => {
+
+    const token = jwt.sign({ email: email }, process.env.JWT_SECRET_KEY, {
+        expiresIn: expiry
+    });
+
+    return token;
+}
 
 
 module.exports.verifyToken = (token) => {
